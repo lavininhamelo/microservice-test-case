@@ -18,7 +18,8 @@ routes.delete('/movie/:id', MovieController.delete)
 
 //Genders
 routes.get('/genders', GenderController.index)
-routes.get('/gender', GenderController.show)
+routes.get('/gender/:id', GenderController.show)
 routes.post('/gender', GenderController.create)
 routes.delete('/gender/:id', GenderController.delete)
+
 export default routes
