@@ -1,0 +1,19 @@
+version: "3"
+services:
+  catalog-service:
+    container_name: catalog-service-container
+    build: ./catalog-service/
+    entrypoint: /docker-entrypoint.sh
+    ports:
+      - 3005:3333
+    volumes:
+      - catalog-service-volume:/home/node/app
+    networks:
+      - main-network
+
+volumes:
+  catalog-service-volume:
+    external: false
+networks:
+  main-network:
+    driver: bridge
