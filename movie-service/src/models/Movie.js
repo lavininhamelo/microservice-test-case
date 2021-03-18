@@ -1,8 +1,8 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose'
 
 const MovieSchema = new Schema({
   name: String,
-  genders: [{ type: Schema.Types.ObjectId, ref: "Gender" }],
-});
+  genders: [{ type: Schema.Types.ObjectId, ref: 'Gender' }]
+})
 
-export default mongoose.model("Movie", MovieSchema);
+export default mongoose.model('Movie', MovieSchema)
