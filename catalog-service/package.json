@@ -9,6 +9,7 @@
     "sucrase": "^3.17.1"
   },
   "dependencies": {
+    "amqplib": "^0.7.1",
     "dotenv": "^8.2.0",
     "elasticsearch": "^16.7.2",
     "express": "^4.17.1",

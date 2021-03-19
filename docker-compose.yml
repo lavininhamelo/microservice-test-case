@@ -2,18 +2,71 @@ version: "3"
 services:
   catalog-service:
     container_name: catalog-service-container
-    build: ./catalog-service/
-    entrypoint: /docker-entrypoint.sh
+    build: ./catalog-service
+    entrypoint: ./.docker/docker-entrypoint.sh
     ports:
       - 3005:3333
     volumes:
       - catalog-service-volume:/home/node/app
     networks:
       - main-network
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  movie-service:
+    container_name: movie-service-container
+    build: ./movie-service
+    entrypoint: ./.docker/docker-entrypoint.sh
+    ports:
+      - 3004:3333
+    volumes:
+      - movie-service-volume:/home/node/app
+    networks:
+      - main-network
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  store-service:
+    container_name: store-service-container
+    build: ./store-service
+    entrypoint: ./.docker/docker-entrypoint.sh
+    ports:
+      - 3003:3333
+    volumes:
+      - store-service-volume:/home/node/app
+    networks:
+      - main-network
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=leleco
+      - MONGO_INITDB_ROOT_PASSWORD=leleco
+      - MONGO_INITDB_DATABASE=moviedb
+    volumes:
+      - mongo-service-volume:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - main-network
+    restart: unless-stopped
 
 volumes:
   catalog-service-volume:
     external: false
+  movie-service-volume:
+    external: false
+  store-service-volume:
+    external: false
+  mongo-service-volume:
+    external: false
+
 networks:
   main-network:
     driver: bridge
