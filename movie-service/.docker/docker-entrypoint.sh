@@ -2,4 +2,4 @@
 cd /home/node/app
 
 
-yarn install && yarn build && yarn start
+yarn install && yarn build && yarn dev

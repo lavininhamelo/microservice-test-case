@@ -17,7 +17,9 @@ class MovieController {
 
       return res.status(200).json(movie);
     } catch (err) {
-      return res.status(400).json({ error: "Error retrieving data!" });
+      return res
+        .status(400)
+        .json({ data: err, error: "Error retrieving data!" });
     }
   }
 
@@ -33,7 +35,9 @@ class MovieController {
 
       return res.status(201).json(movie_data);
     } catch (err) {
-      return res.status(400).json({ error: "Error registering movie" });
+      return res
+        .status(400)
+        .json({ data: err, error: "Error registering movie" });
     }
   }
 

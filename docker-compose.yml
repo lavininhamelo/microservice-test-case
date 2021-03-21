@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   catalog-service:
     container_name: catalog-service-container
@@ -7,13 +7,15 @@ services:
     ports:
       - 3005:3333
     volumes:
-      - catalog-service-volume:/home/node/app
+      - ./catalog-service:/home/node/app
     networks:
       - main-network
     links:
-      - mongodb
+      - db
+      - rabbitmq
     depends_on:
-      - mongodb
+      - db
+      - rabbitmq
   movie-service:
     container_name: movie-service-container
     build: ./movie-service
@@ -21,13 +23,15 @@ services:
     ports:
       - 3004:3333
     volumes:
-      - movie-service-volume:/home/node/app
+      - ./movie-service:/home/node/app
     networks:
       - main-network
     links:
-      - mongodb
+      - db
+      - rabbitmq
     depends_on:
-      - mongodb
+      - db
+      - rabbitmq
   store-service:
     container_name: store-service-container
     build: ./store-service
@@ -35,20 +39,21 @@ services:
     ports:
       - 3003:3333
     volumes:
-      - store-service-volume:/home/node/app
+      - ./store-service:/home/node/app
     networks:
       - main-network
     links:
-      - mongodb
+      - db
+      - rabbitmq
     depends_on:
-      - mongodb
-  mongodb:
+      - db
+      - rabbitmq
+  db:
     image: mongo
-    container_name: mongodb
+    container_name: db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=leleco
       - MONGO_INITDB_ROOT_PASSWORD=leleco
-      - MONGO_INITDB_DATABASE=moviedb
     volumes:
       - mongo-service-volume:/data/db
     ports:
@@ -56,14 +61,27 @@ services:
     networks:
       - main-network
     restart: unless-stopped
+  rabbitmq:
+    image: 'rabbitmq:3.8-management-alpine'
+    hostname: rabbitmq
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+    volumes:
+      - './rabbitmq_data:/var/lib/rabbitmq/mnesia'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - main-network
 
 volumes:
-  catalog-service-volume:
-    external: false
-  movie-service-volume:
-    external: false
-  store-service-volume:
-    external: false
+  #   catalog-service-volume:
+  #     external: false
+  #   movie-service-volume:
+  #     external: false
+  #   store-service-volume:
+  #     external: false
   mongo-service-volume:
     external: false
 

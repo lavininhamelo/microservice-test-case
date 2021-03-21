@@ -1,13 +1,15 @@
 import "dotenv/config";
 import express from "express";
 import routes from "./routes";
-import "./config/database/index";
+import db from "./config/database/index";
 
 class App {
   constructor() {
     this.server = express();
     this.middlewares();
     this.routes();
+    db();
+    console.log("Iniciando");
   }
 
   middlewares() {

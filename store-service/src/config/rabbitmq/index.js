@@ -1,35 +1,45 @@
-import amqp from "amqplib/callback_api";
+import amqp from 'amqplib/callback_api';
 
-const RABBITMQ_URL =
-  "amqp://admin:admin@rabbitmq:5672" || process.env.RABBITMQ_URL;
+class RabbitMQ {
+  constructor() {
+    this.channel = null;
+  }
+  connect() {
+    return new Promise((resolve, reject) => {
+      amqp.connect(process.env.RABBITMQ, (err, connection) => {
+        this.channel = connection.createChannel();
+        resolve();
+      });
+    });
+  }
+  async createQueue(queueName, routingKey) {
+    try {
+      const exchange = this.channel.assertExchange('amq.direct', 'direct');
+      await this.channel.bindQueue(queueName, 'amq.direct', routingKey);
 
-function connect() {
-  return amqp.connect(RABBITMQ_URL).then((conn) => conn.createChannel());
-}
-
-async function createQueue(channel, queueName) {
-  try {
-    const queue = await channel.assertQueue(queueName, { durable: true });
-    return queue;
-  } catch (err) {
-    console.log(err);
+      return exchange;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async sentToQueue(queueName, routingKey, message) {
+    try {
+      const queue = await this.createQueue(queueName, routingKey);
+      queue.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
+      return queue;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async consume(queueName, routingKey) {
+    const queue = await this.createQueue(queueName, routingKey);
+    return await queue.consume(
+      queueName,
+      (msg) => console.log(msg.content.toString()),
+      {
+        noAck: true,
+      }
+    );
   }
 }
-
-async function sentToQueue(queueName, message) {
-  try {
-    const channel = await connect();
-    const queue = await createQueue(channel, queueName);
-    return queue.sendToQueue(queueName, Buffer.from(JSON.stringify(message)));
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function consume(queueName, callback) {
-  const channel = await connect();
-  const queue = await createQueue(channel, queueName);
-  return queue.consume(queueName, callback, { noAck: true });
-}
-
-export default { consume, sentToQueue };
+export default RabbitMQ;
